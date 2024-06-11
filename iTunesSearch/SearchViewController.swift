@@ -7,6 +7,7 @@
 
 
 import UIKit
+import Foundation
 
 class SearchViewController:UIViewController {
     
@@ -42,20 +43,27 @@ class SearchViewController:UIViewController {
     
     func configure(cell: CollectionViewCell, forItemAt indexPath: IndexPath) {
         
-        
-        
         let item = self.items[indexPath.row]
         
+        let formatter = DateComponentsFormatter()
+        let second = TimeInterval(item.trackTimeMillis/1000)
+        let trackTimeMillis =  formatter.string(from: second)
+        
         cell.trackName.text = item.name
-        cell.trackTimeMillis.text = "\(item.trackTimeMillis)"
-//        cell.longDescription.text = item.longDescription
+        cell.playTrackName.text = item.name
+        cell.trackTimeMillis.text = trackTimeMillis
+        cell.playTrackTimeMillis.text = trackTimeMillis
+        //        cell.longDescription.text = item.longDescription
         cell.artworkUrl100?.image = UIImage(systemName: "photo")
+        cell.playArtworkUrl100?.image = UIImage(systemName: "photo")
+        cell.url = item.previewUrl
         
         // initialize a network task to fetch the item's artwork
         StoreItemController.shared.fetchImage(from: item.artworkURL) { image in
             if let image = image {
                 DispatchQueue.main.async {
                     cell.artworkUrl100.image = image
+                    cell.playArtworkUrl100.image = image
                 }
             }
         }
@@ -77,31 +85,29 @@ class SearchViewController:UIViewController {
 extension SearchViewController:UICollectionViewDataSource,UICollectionViewDelegate,UICollectionViewDelegateFlowLayout{
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CollectionViewCell", for: indexPath) as! CollectionViewCell
         
-//        cell.play = true
-        if selectedIndexPath == indexPath {
-                    selectedIndexPath = nil
-//            cell.heightConstraint.constant = 0
-                } else {
-                    selectedIndexPath = indexPath
-//                    cell.heightConstraint.constant = 200
-                }
+        if self.selectedIndexPath == indexPath {
+            self.selectedIndexPath = nil
+        } else {
+            self.selectedIndexPath = indexPath
+        }
         UIView.animate(withDuration: 0.3, animations: {
-                    collectionView.collectionViewLayout.invalidateLayout()
-                })
-
+            collectionView.collectionViewLayout.invalidateLayout()
+        })
+        
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-
+        
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CollectionViewCell", for: indexPath) as! CollectionViewCell
-        print(cell.longDescription.frame.height)
         let longDescriptionHeight = cell.longDescription.frame.height
         let width =  view.frame.width - 30
         var height = width/3 >= longDescriptionHeight ? width/3 + 70 : longDescriptionHeight + 70
-        if let selectedIndexPath = selectedIndexPath, selectedIndexPath == indexPath {
+        if let selectedIndexPath = self.selectedIndexPath, selectedIndexPath == indexPath {
             height += 200
+//            cell.bottomView.isHidden = false
+        }else{
+//            cell.bottomView.isHidden = true
         }
         return .init(width: width, height: height)
     }
@@ -111,7 +117,7 @@ extension SearchViewController:UICollectionViewDataSource,UICollectionViewDelega
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return items.count
+        return self.items.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

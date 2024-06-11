@@ -13,6 +13,7 @@ struct StoreModel: Codable {
     var trackTimeMillis: Int
 //    let longDescription: String
     var artworkURL: URL
+    var previewUrl: URL
     
     enum CodingKeys: String, CodingKey {
         case name = "trackName"
@@ -20,6 +21,7 @@ struct StoreModel: Codable {
         case trackTimeMillis
 //        case longDescription
         case artworkURL = "artworkUrl100"
+        case previewUrl = "previewUrl"
     }
    
 }
