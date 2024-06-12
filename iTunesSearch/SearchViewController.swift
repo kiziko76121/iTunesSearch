@@ -120,6 +120,7 @@ extension SearchViewController:UICollectionViewDataSource,UICollectionViewDelega
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         self.view?.endEditing(false)
+        self.bottomView.isHidden = false
         self.player.pause()
         self.playImage.image = UIImage(systemName: "play.fill")
         self.playerItem = nil
@@ -127,6 +128,7 @@ extension SearchViewController:UICollectionViewDataSource,UICollectionViewDelega
         self.playTrackName.text = item.name
         self.playTrackTimeMillis.text = toTrackTimeMillis(value: item.trackTimeMillis)
         self.url = item.previewUrl
+        self.buttonTouch(true)
         
         StoreItemController.shared.fetchImage(from: item.artworkURL) { image in
             if let image = image {
